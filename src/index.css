@@ -1,0 +1,448 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap');
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f4f1e9;
+  --surface: #ffffff;
+  --panel: #ece7db;
+  --ink: #16211a;
+  --muted: #6b7a64;
+  --line: #e2ddcf;
+  --primary: #607848;
+  --primary-deep: #3f5230;
+  --gold: #b08a45;
+  --gold-deep: #8a6a2f;
+  --cream: #f7f2e6;
+  --cocoa: #2c1d12;
+  --glow: rgba(96, 120, 72, 0.35);
+
+  /* بتتحدّث تلقائياً من الهيدر وشريط الأقسام (ResizeObserver) */
+  --site-header-h: 4rem;
+  --category-nav-h: 3.25rem;
+}
+
+.dark {
+  --bg: #0c120b;
+  --surface: #131c12;
+  --panel: #1a2517;
+  --ink: #f1f5ee;
+  --muted: #93a68c;
+  --line: #24301f;
+  --primary: #7fa066;
+  --primary-deep: #5d7c48;
+  --gold: #e2c469;
+  --gold-deep: #c9a94f;
+  --cream: #f6efdd;
+  --cocoa: #150e08;
+  --glow: rgba(127, 160, 102, 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-cream: var(--cream);
+  --color-cocoa: var(--cocoa);
+
+  --font-sans: 'Outfit', 'Tajawal', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Cinzel', 'Outfit', serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+[dir='rtl'] {
+  font-family: 'Tajawal', var(--font-sans);
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+}
+
+@utility gold-text {
+  background: linear-gradient(135deg, var(--gold-deep) 0%, #ecd79a 45%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility gold-bg {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%);
+}
+
+@utility primary-bg {
+  background: linear-gradient(150deg, var(--primary) 0%, var(--primary-deep) 105%);
+}
+
+@utility card-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--glow);
+  }
+  70% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.animate-floaty {
+  animation: floaty 5s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+/* ---------------- Admin / forms ---------------- */
+.field {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+.field:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 22%, transparent);
+}
+select.field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 1rem) 55%, calc(100% - 0.7rem) 55%;
+  background-size: 7px 7px, 7px 7px;
+  background-repeat: no-repeat;
+}
+[dir='rtl'] select.field {
+  background-position: 0.7rem 55%, 1rem 55%;
+}
+textarea.field {
+  resize: vertical;
+  min-height: 4.4rem;
+}
+.label-in {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.admin-card {
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 14px 34px -26px rgba(22, 33, 26, 0.5);
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 0.95rem;
+  padding: 0.62rem 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--cream);
+  background: linear-gradient(150deg, var(--primary) 0%, var(--primary-deep) 105%);
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+.btn-primary:active {
+  transform: scale(0.96);
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 0.95rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+.btn-ghost:active {
+  transform: scale(0.96);
+}
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--primary);
+}
+.tab-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--muted);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+.tab-btn.active {
+  color: var(--cream);
+  background: linear-gradient(150deg, var(--primary) 0%, var(--primary-deep) 105%);
+  box-shadow: 0 8px 18px -10px var(--glow);
+}
+
+/* ================================================================== */
+/*  BENOVA · Executive admin console                                  */
+/* ================================================================== */
+
+.exec-admin {
+  --bg: #0a0806;
+  --surface: #17120d;
+  --panel: #211a12;
+  --ink: #f7f1e5;
+  --muted: #a89b86;
+  --line: rgba(231, 204, 139, 0.13);
+  --primary: #d5b46a;
+  --primary-deep: #b28c40;
+  --gold: #e7c97b;
+  --gold-deep: #c7a75d;
+  --cream: #fbf6e9;
+  --cocoa: #160f09;
+  --glow: rgba(213, 180, 106, 0.28);
+  --toggle-travel: 1.25rem;
+  --status-travel: 1rem;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 16% -8%, rgba(231, 201, 123, 0.13), transparent 32rem),
+    radial-gradient(circle at 94% 8%, rgba(111, 142, 85, 0.1), transparent 28rem),
+    radial-gradient(circle at 52% 110%, rgba(183, 130, 54, 0.08), transparent 34rem),
+    #0a0806;
+}
+.exec-admin[dir='rtl'] {
+  --toggle-travel: -1.25rem;
+  --status-travel: -1rem;
+}
+
+.exec-admin .field {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+.exec-admin .field::placeholder {
+  color: rgba(211, 197, 170, 0.38);
+}
+.exec-admin .field:hover {
+  border-color: rgba(231, 201, 123, 0.22);
+}
+.exec-admin .field:focus {
+  border-color: rgba(231, 201, 123, 0.65);
+  background: rgba(255, 255, 255, 0.065);
+  box-shadow: 0 0 0 3px rgba(231, 201, 123, 0.12);
+}
+.exec-admin select.field option {
+  background: #1a140e;
+  color: #f7f1e5;
+}
+.exec-admin input[type='date'],
+.exec-admin input[type='number'] {
+  color-scheme: dark;
+}
+.exec-admin .label-in {
+  color: rgba(206, 190, 160, 0.7);
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  font-size: 0.64rem;
+}
+.exec-admin .admin-card {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+    rgba(22, 17, 12, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 26px 70px -46px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(24px) saturate(1.16);
+  -webkit-backdrop-filter: blur(24px) saturate(1.16);
+}
+.exec-admin .btn-primary {
+  color: #1a130b;
+  border: 1px solid rgba(255, 245, 219, 0.2);
+  background: linear-gradient(145deg, #f0d78f 0%, #d5b46a 45%, #b28c40 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 14px 30px -18px rgba(213, 180, 106, 0.8);
+}
+.exec-admin .btn-primary:hover {
+  filter: brightness(1.05) saturate(1.03);
+}
+.exec-admin .btn-ghost {
+  color: rgba(247, 241, 229, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
+}
+.exec-admin .btn-ghost:hover {
+  color: var(--gold);
+  border-color: rgba(231, 201, 123, 0.36);
+  background: rgba(231, 201, 123, 0.07);
+}
+.exec-admin ::selection {
+  background: rgba(213, 180, 106, 0.85);
+  color: #1a130b;
+}
+.exec-admin .exec-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(231, 201, 123, 0.22) transparent;
+}
+.exec-admin .exec-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.exec-admin .exec-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(231, 201, 123, 0.2);
+}
+.exec-admin .exec-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.exec-glass {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
+    rgba(22, 17, 12, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 28px 80px -52px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(26px) saturate(1.18);
+  -webkit-backdrop-filter: blur(26px) saturate(1.18);
+}
+
+.exec-nav-active {
+  background:
+    linear-gradient(90deg, rgba(231, 201, 123, 0.16), rgba(231, 201, 123, 0.035)),
+    rgba(255, 255, 255, 0.025);
+  border-color: rgba(231, 201, 123, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 16px 40px -30px rgba(231, 201, 123, 0.7);
+}
+[dir='rtl'] .exec-nav-active {
+  background:
+    linear-gradient(270deg, rgba(231, 201, 123, 0.16), rgba(231, 201, 123, 0.035)),
+    rgba(255, 255, 255, 0.025);
+}
+
+@keyframes exec-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.42);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(52, 211, 153, 0);
+  }
+}
+.exec-status-open {
+  animation: exec-pulse 2.4s ease-out infinite;
+}
+
+@keyframes exec-shimmer {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+.exec-shimmer {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: exec-shimmer 5.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exec-status-open,
+  .exec-shimmer {
+    animation: none;
+  }
+}
