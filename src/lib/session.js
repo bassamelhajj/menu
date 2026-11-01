@@ -14,9 +14,6 @@
 /** المفتاح اللي بنحفظ فيه الحساب داخل الجلسة */
 const KEY = 'benova:customer'
 
-/** مفتاح جلسة صاحب المحل — نفس الجلسة القصيرة */
-export const ADMIN_AUTH_KEY = 'benova:admin'
-
 /**
  * بيقرأ الحساب المحفوظ (أو null).
  * ⚠️ بنقرأ من sessionStorage مباشرة كل مرة بدون cache،
@@ -47,24 +44,4 @@ export function setSession(user) {
 /** ⏏️ خروج */
 export function clearSession() {
   return setSession(null)
-}
-
-/** هل صاحب المحل مسجّل دخول بهذه الجلسة؟ */
-export function hasAdminSession() {
-  try {
-    return sessionStorage.getItem(ADMIN_AUTH_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
-/** فتح/إغلاق جلسة صاحب المحل */
-export function setAdminSession(open = true) {
-  try {
-    if (open) sessionStorage.setItem(ADMIN_AUTH_KEY, '1')
-    else sessionStorage.removeItem(ADMIN_AUTH_KEY)
-  } catch {
-    /* وضع التصفح الخاص — نتجاهل بهدوء */
-  }
-  return open
 }

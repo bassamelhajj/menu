@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useApp } from '../store/AppContext'
 import { navigate } from '../lib/hashRoute'
-import { hasAdminSession, setAdminSession } from '../lib/session'
+import { getAdminSession, logoutAdmin } from '../lib/adminApi'
 import AccountPage from './AccountPage'
 import AdminShell from './admin/AdminShell'
 import DashboardTab from './admin/DashboardTab'
@@ -18,15 +18,41 @@ import PagesTab from './admin/PagesTab'
 import PublishTab from './admin/PublishTab'
 
 export default function Admin() {
-  const { notify } = useApp()
-  const [authed, setAuthed] = useState(hasAdminSession)
+  const { notify, lang } = useApp()
+  const [authed, setAuthed] = useState(null)
   const [tab, setTab] = useState('dashboard')
+
+  // الجلسة تُتحقق من السيرفر، وليس من sessionStorage القابل للتلاعب.
+  useEffect(() => {
+    let alive = true
+    getAdminSession()
+      .then((result) => {
+        if (alive) setAuthed(Boolean(result.data?.authenticated))
+      })
+      .catch(() => {
+        if (alive) setAuthed(false)
+      })
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  if (authed === null) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-cocoa text-cream">
+        <p className="text-xs font-bold text-cream/60">
+          {lang === 'ar' ? 'جارٍ التحقق من الجلسة…' : 'Checking your session…'}
+        </p>
+      </div>
+    )
+  }
 
   // نفس شاشة الدخول الموحّدة — التوجيه للأدمن بيصير من الحساب نفسه.
   if (!authed) return <AccountPage adminEntry onAdminAuthed={() => setAuthed(true)} />
 
-  const logout = () => {
-    setAdminSession(false)
+  const logout = async () => {
+    await logoutAdmin()
+    setAuthed(false)
     navigate('/')
   }
 

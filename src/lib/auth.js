@@ -63,17 +63,6 @@ export async function verifySecret(value, expectedHash) {
   }
 }
 
-/**
- * TEMPORARY local-development check: direct plaintext comparison.
- * Used only while the temp admin login is enabled in src/lib/env.js.
- * Production credentials must continue to use verifySecret().
- */
-export function verifyPlainSecret(value, expected) {
-  const target = String(expected ?? '')
-  if (!target || value == null) return false
-  return String(value) === target
-}
-
 /** هل الإيميل شكله صحيح؟ */
 export const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim())
 

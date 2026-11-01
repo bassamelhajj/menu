@@ -3,11 +3,11 @@
  * ===========================================================================
  * 🧠 المنطق:
  *   • صفحة دخول واحدة للزبائن وصاحب المحل — بدون زر «دخول الإدارة».
- *   • إذا طابق اسم مستخدم الأدمن وكلمة السر → #/admin.
+ *   • إذا نجح دخول الأدمن على السيرفر → #/admin.
  *   • إذا كان زبوناً عادياً → جلسة زبون + توجيه للمنيو الرئيسي.
  *   • إنشاء حساب جديد → جلسة زبون + توجيه للمنيو الرئيسي.
  *   • جلسة الزبون = sessionStorage بمفتاح benova:customer
- *   • جلسة الأدمن = sessionStorage بمفتاح benova:admin
+ *   • جلسة الأدمن = كوكي HttpOnly يضبطها السيرفر (وليست sessionStorage)
  *
  * 🎨 نفس هوية بوابة الإدارة: بطاقة داكنة/فاتحة متكيّفة، ذهب وزمرد،
  *    حقول ناعمة، إظهار/إخفاء كلمة السر، تحقق لحظي، وتهدئة بعد المحاولات.
@@ -18,18 +18,8 @@ import { useApp } from '../store/AppContext'
 import { useContent } from '../store/ContentContext'
 import { navigate } from '../lib/hashRoute'
 import { isEmail, isPhone } from '../lib/auth'
-import {
-  ADMIN_USERNAME,
-  isAdminAuthConfigured,
-  isTempLocalAdminEnabled,
-  verifyAdminPassword,
-} from '../lib/env'
-import {
-  clearSession,
-  getSession,
-  setAdminSession,
-  setSession,
-} from '../lib/session'
+import { loginAdmin } from '../lib/adminApi'
+import { clearSession, getSession, setSession } from '../lib/session'
 import ReviewForm from '../components/ReviewForm'
 import AuthShell from '../components/auth/AuthShell'
 import {
@@ -58,11 +48,6 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
   const ar = lang === 'ar'
   const tone = dark ? 'dark' : 'light'
 
-  const adminUser = ADMIN_USERNAME.toLowerCase()
-  const isAdminUserValue = (value) =>
-    isAdminAuthConfigured &&
-    String(value || '').trim().toLowerCase() === adminUser
-
   /* 🔐 الحساب الحالي + نوع آخر نجاح */
   const [user, setUser] = useState(() => (adminEntry ? null : getSession()))
   const [welcome, setWelcome] = useState(null) // 'signup' | 'signin' | null
@@ -83,7 +68,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
 
   const isUp = mode === 'signUp'
   const locked = cooldown > 0
-  const identifierOk = isEmail(email) || (!isUp && isAdminUserValue(email))
+  const identifierOk = isEmail(email) || (!isUp && String(email).trim().length > 0)
 
   /* ⏳ عدّاد التهدئة بعد المحاولات الكثيرة */
   useEffect(() => {
@@ -100,7 +85,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
       String(value).trim() ? '' : ar ? 'اكتب اسمك الكامل' : 'Please enter your full name',
     email: (value) => {
       if (isEmail(value)) return ''
-      if (!isUp && isAdminUserValue(value)) return ''
+      if (!isUp && String(value).trim()) return ''
       return ar
         ? 'إيميل غير صالح — مثال: name@mail.com'
         : 'Enter a valid email — e.g. name@mail.com'
@@ -184,16 +169,6 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
     setErrors(next)
     if (Object.values(next).some(Boolean)) return
 
-    // إيميل/معرّف محجوز للإدارة؟
-    if (isAdminUserValue(email)) {
-      setErrors({
-        email: ar
-          ? 'هذا المعرّف محجوز لإدارة الموقع — استخدم إيميلاً آخر'
-          : 'This identifier is reserved for the restaurant owner — use another email',
-      })
-      return
-    }
-
     // إيميل مكرر؟
     if (customerExists(email)) {
       setErrors({
@@ -236,23 +211,23 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
 
     const entered = String(email).trim()
 
-    // 👑 صاحب المحل → لوحة التحكم مباشرة
-    if (isAdminUserValue(entered)) {
-      const passwordOk = await verifyAdminPassword(password)
+    // 👑 دخول الأدمن يتم التحقق منه على السيرفر عبر كوكي HttpOnly
+    const adminResult = await loginAdmin(entered, password)
+    if (adminResult.ok && adminResult.data?.authenticated) {
+      setAttempts(0)
+      setCooldown(0)
+      setCapsLock(false)
+      notify(ar ? 'أهلاً فيك بلوحة التحكم 👑' : 'Welcome to the dashboard 👑')
+      if (onAdminAuthed) onAdminAuthed()
+      else navigate('/admin')
+      return
+    }
 
-      if (passwordOk) {
-        setAdminSession(true)
-        setAttempts(0)
-        setCooldown(0)
-        setCapsLock(false)
-        notify(ar ? 'أهلاً فيك بلوحة التحكم 👑' : 'Welcome to the dashboard 👑')
-        if (onAdminAuthed) onAdminAuthed()
-        else navigate('/admin')
-        return
-      }
-
+    if (adminResult.status === 429) {
       registerFailure(
-        ar ? 'الإيميل أو كلمة السر غير صحيحة' : 'Wrong email or password',
+        ar
+          ? 'محاولات كتير على السيرفر — جرّب بعد شوي'
+          : 'Too many server attempts — try again later',
       )
       setPassword('')
       return
@@ -352,21 +327,6 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
                   : 'Customer or owner — we will take you to the right place.'}
             </p>
 
-            {adminEntry && isTempLocalAdminEnabled && (
-              <div className="mt-3 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-[10px] font-bold leading-relaxed text-emerald-700 dark:text-emerald-300">
-                {ar
-                  ? 'وضع الدخول المحلي المؤقت مفعّل — استخدم admin@benova.com.'
-                  : 'Temporary local admin mode is enabled — use admin@benova.com.'}
-              </div>
-            )}
-
-            {adminEntry && !isAdminAuthConfigured && (
-              <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-[10px] font-bold leading-relaxed text-amber-700 dark:text-amber-300">
-                {ar
-                  ? 'دخول الإدارة غير مهيأ. أضف VITE_ADMIN_USERNAME و VITE_ADMIN_PASSWORD_SHA256 إلى متغيرات البيئة.'
-                  : 'Admin access is not configured. Set VITE_ADMIN_USERNAME and VITE_ADMIN_PASSWORD_SHA256 in your environment.'}
-              </div>
-            )}
           </div>
 
           {/* النموذج */}
@@ -429,13 +389,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
                 clearErrors('email')
               }}
               onBlur={() => softValidate('email', email)}
-              placeholder={
-                isUp
-                  ? 'name@mail.com'
-                  : isTempLocalAdminEnabled
-                    ? 'admin@benova.com'
-                    : 'name@mail.com / admin'
-              }
+              placeholder="name@mail.com"
               autoComplete="email"
               inputMode="email"
               ltr

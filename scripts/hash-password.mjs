@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { hashAdminPassword } from '../server/adminAuth.js'
 
 const password = process.argv.slice(2).join(' ')
 
@@ -7,4 +7,9 @@ if (!password) {
   process.exit(1)
 }
 
-console.log(createHash('sha256').update(password).digest('hex'))
+if (password.length < 12) {
+  console.error('Use at least 12 characters for the admin password.')
+  process.exit(1)
+}
+
+console.log(hashAdminPassword(password))

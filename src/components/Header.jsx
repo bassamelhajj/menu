@@ -14,7 +14,8 @@ import { useContent } from '../store/ContentContext'
 import { useUI } from '../store/UIContext'
 import { useBusinessStatus } from '../lib/hours'
 import { navigate, useHashRoute } from '../lib/hashRoute'
-import { clearSession, getSession, hasAdminSession, setAdminSession } from '../lib/session'
+import { clearSession, getSession } from '../lib/session'
+import { getAdminSession, logoutAdmin } from '../lib/adminApi'
 import {
   IconCart,
   IconChevron,
@@ -50,7 +51,7 @@ function AccountMenu() {
   const route = useHashRoute()
   const [open, setOpen] = useState(false)
   const [session, setSessionState] = useState(() => getSession())
-  const [admin, setAdminState] = useState(() => hasAdminSession())
+  const [admin, setAdminState] = useState(false)
   const wrapRef = useRef(null)
   const ar = lang === 'ar'
 
@@ -63,7 +64,10 @@ function AccountMenu() {
     if (!open) return undefined
 
     setSessionState(getSession())
-    setAdminState(hasAdminSession())
+    let alive = true
+    getAdminSession().then((result) => {
+      if (alive) setAdminState(Boolean(result.data?.authenticated))
+    })
 
     const onPointerDown = (event) => {
       if (wrapRef.current && !wrapRef.current.contains(event.target)) setOpen(false)
@@ -74,6 +78,7 @@ function AccountMenu() {
     document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
     return () => {
+      alive = false
       document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
     }
@@ -98,9 +103,9 @@ function AccountMenu() {
     navigate(target)
   }
 
-  const signOut = () => {
+  const signOut = async () => {
     clearSession()
-    setAdminSession(false)
+    await logoutAdmin()
     setSessionState(null)
     setAdminState(false)
     setOpen(false)

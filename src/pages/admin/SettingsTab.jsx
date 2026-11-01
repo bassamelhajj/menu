@@ -4,14 +4,7 @@ import { useContent } from '../../store/ContentContext'
 import { clampPercent } from '../../lib/format'
 import { Card, Field, SectionHead } from './ui'
 import { normalizeUrl } from '../../data/settings'
-import {
-  changeAdminPassword,
-  hasAdminPasswordOverride,
-  isAdminAuthConfigured,
-  isSiteLockEnabled,
-  resetAdminPassword,
-  verifyAdminPassword,
-} from '../../lib/env'
+import { isSiteLockEnabled } from '../../lib/env'
 
 const FALLBACK_LOGO = '/brand/benova-logo.png'
 
@@ -26,11 +19,6 @@ const normalizeLogoSrc = (value) => {
 export default function SettingsTab({ notify }) {
   const { t, lang } = useApp()
   const { settings, setSettings } = useContent()
-
-  const [passwordForm, setPasswordForm] = useState({ current: '', next: '', confirm: '' })
-  const [passwordStatus, setPasswordStatus] = useState(null)
-  const [savingPassword, setSavingPassword] = useState(false)
-  const passwordOverrideActive = hasAdminPasswordOverride()
 
   const [draft, setDraft] = useState(() =>
     JSON.parse(
@@ -70,46 +58,6 @@ export default function SettingsTab({ notify }) {
       cur[keys[keys.length - 1]] = value
       return next
     })
-
-  const handleChangePassword = async () => {
-    setPasswordStatus(null)
-    if (!passwordForm.current) {
-      setPasswordStatus({ type: 'error', message: lang === 'ar' ? 'أدخل كلمة السر الحالية' : 'Enter the current password' })
-      return
-    }
-    if (String(passwordForm.next || '').length < 4) {
-      setPasswordStatus({ type: 'error', message: lang === 'ar' ? 'كلمة السر الجديدة 4 خانات على الأقل' : 'New password needs at least 4 characters' })
-      return
-    }
-    if (passwordForm.next !== passwordForm.confirm) {
-      setPasswordStatus({ type: 'error', message: lang === 'ar' ? 'تأكيد كلمة السر غير مطابق' : 'Password confirmation does not match' })
-      return
-    }
-
-    setSavingPassword(true)
-    try {
-      const ok = await verifyAdminPassword(passwordForm.current)
-      if (!ok) {
-        setPasswordStatus({ type: 'error', message: lang === 'ar' ? 'كلمة السر الحالية غير صحيحة' : 'Current password is wrong' })
-        return
-      }
-      await changeAdminPassword(passwordForm.next)
-      setPasswordForm({ current: '', next: '', confirm: '' })
-      setPasswordStatus({ type: 'success', message: lang === 'ar' ? 'تم تغيير كلمة السر بنجاح' : 'Password changed successfully' })
-      notify(lang === 'ar' ? 'تم تغيير كلمة السر' : 'Password changed')
-    } catch {
-      setPasswordStatus({ type: 'error', message: lang === 'ar' ? 'تعذّر تغيير كلمة السر' : 'Could not change password' })
-    } finally {
-      setSavingPassword(false)
-    }
-  }
-
-  const handleResetPassword = () => {
-    resetAdminPassword()
-    setPasswordForm({ current: '', next: '', confirm: '' })
-    setPasswordStatus({ type: 'success', message: lang === 'ar' ? 'تمت استعادة كلمة السر الافتراضية' : 'Reset to the default password' })
-    notify(lang === 'ar' ? 'تمت الاستعادة' : 'Reset complete')
-  }
 
   const save = () => {
     setSettings({
@@ -327,20 +275,8 @@ export default function SettingsTab({ notify }) {
             <span className="text-[10px] font-bold text-white/55">
               {lang === 'ar' ? 'دخول لوحة التحكم' : 'Admin access'}
             </span>
-            <span
-              className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider ${
-                isAdminAuthConfigured
-                  ? 'bg-emerald-400/15 text-emerald-300'
-                  : 'bg-amber-400/15 text-amber-300'
-              }`}
-            >
-              {isAdminAuthConfigured
-                ? lang === 'ar'
-                  ? 'مهيأ'
-                  : 'Configured'
-                : lang === 'ar'
-                  ? 'غير مهيأ'
-                  : 'Not configured'}
+            <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-emerald-300">
+              {lang === 'ar' ? 'سيرفر · HttpOnly' : 'Server · HttpOnly'}
             </span>
           </div>
           <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
@@ -366,101 +302,43 @@ export default function SettingsTab({ notify }) {
         </div>
 
         <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.025] p-3.5">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-[10px] font-black text-white/65">
               {lang === 'ar' ? 'تغيير كلمة سر الأدمن' : 'Change admin password'}
             </p>
-            <span
-              className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider ${
-                passwordOverrideActive
-                  ? 'bg-gold/15 text-gold'
-                  : 'bg-white/10 text-white/40'
-              }`}
-            >
-              {passwordOverrideActive
-                ? lang === 'ar'
-                  ? 'مخصّصة على هذا المتصفح'
-                  : 'Local override'
-                : lang === 'ar'
-                  ? 'الافتراضية'
-                  : 'Default'}
+            <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-gold">
+              {lang === 'ar' ? 'من السيرفر' : 'Server-side'}
             </span>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Field
-              label={lang === 'ar' ? 'كلمة السر الحالية' : 'Current password'}
-              type="password"
-              value={passwordForm.current}
-              onChange={(value) => setPasswordForm((form) => ({ ...form, current: value }))}
-              placeholder="••••••••"
-            />
-            <Field
-              label={lang === 'ar' ? 'كلمة السر الجديدة' : 'New password'}
-              type="password"
-              value={passwordForm.next}
-              onChange={(value) => setPasswordForm((form) => ({ ...form, next: value }))}
-              placeholder="••••••••"
-              hint={lang === 'ar' ? '4 خانات على الأقل' : 'At least 4 characters'}
-            />
-            <Field
-              label={lang === 'ar' ? 'تأكيد كلمة السر' : 'Confirm password'}
-              type="password"
-              value={passwordForm.confirm}
-              onChange={(value) => setPasswordForm((form) => ({ ...form, confirm: value }))}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleChangePassword}
-              disabled={savingPassword}
-              className="btn-primary px-4 py-2 text-[10px] disabled:opacity-55"
-            >
-              {savingPassword
-                ? lang === 'ar'
-                  ? 'جارٍ الحفظ…'
-                  : 'Saving…'
-                : lang === 'ar'
-                  ? 'حفظ كلمة السر'
-                  : 'Save password'}
-            </button>
-            {passwordOverrideActive && (
-              <button
-                type="button"
-                onClick={handleResetPassword}
-                className="rounded-xl border border-white/12 bg-white/[0.03] px-4 py-2 text-[10px] font-extrabold text-white/55 transition-colors hover:border-white/20 hover:text-white/75"
-              >
-                {lang === 'ar' ? 'استعادة الافتراضية' : 'Reset to default'}
-              </button>
-            )}
-          </div>
-
-          {passwordStatus && (
-            <p
-              className={`mt-2.5 rounded-xl border px-3 py-2 text-[9.5px] font-bold leading-relaxed ${
-                passwordStatus.type === 'success'
-                  ? 'border-emerald-400/20 bg-emerald-400/[0.07] text-emerald-300'
-                  : 'border-red-400/20 bg-red-500/[0.07] text-red-300'
-              }`}
-            >
-              {passwordStatus.message}
-            </p>
-          )}
-
-          <p className="mt-2.5 text-[9px] font-bold leading-relaxed text-white/32">
+          <p className="text-[9.5px] font-bold leading-relaxed text-white/45">
             {lang === 'ar'
-              ? '🔐 تُحفظ كلمة السر الجديدة كـ SHA-256 في هذا المتصفح فقط، وتُستخدم عند الدخول التالي. لتغييرها على كل الأجهزة، حدّث VITE_ADMIN_PASSWORD_SHA256 في الاستضافة.'
-              : '🔐 The new password is stored as SHA-256 in this browser only and is used for the next sign-in. To change it on every device, update VITE_ADMIN_PASSWORD_SHA256 on the host.'}
+              ? 'لأسباب أمنية لا تُحفظ كلمة السر في المتصفح. أنشئ بصمة scrypt جديدة ثم حدّث متغير السيرفر:'
+              : 'For security, passwords are never stored in the browser. Generate a new scrypt hash, then update the server variable:'}
           </p>
+
+          <code className="mt-2.5 block break-all rounded-xl border border-gold/20 bg-black/20 px-3 py-2 font-mono text-[9px] leading-relaxed text-gold/90">
+            npm run hash -- &quot;كلمة-سر-قوية&quot;
+          </code>
+
+          <div className="mt-2.5 space-y-1 rounded-xl border border-amber-400/15 bg-amber-400/[0.05] px-3 py-2 text-[9px] font-bold leading-relaxed text-amber-200/65">
+            <p>
+              {lang === 'ar'
+                ? 'على Vercel: Settings → Environment Variables → حدّث ADMIN_PASSWORD_HASH ثم أعد النشر.'
+                : 'On Vercel: Settings → Environment Variables → update ADMIN_PASSWORD_HASH, then redeploy.'}
+            </p>
+            <p>
+              {lang === 'ar'
+                ? 'محلياً: ضع البصمة في .env.local ثم أعد تشغيل npm run dev.'
+                : 'Locally: put the hash in .env.local, then restart npm run dev.'}
+            </p>
+          </div>
         </div>
 
         <p className="mt-2.5 rounded-xl border border-gold/12 bg-gold/[0.045] px-3 py-2 text-[9px] font-bold leading-relaxed text-white/32">
           {lang === 'ar'
-            ? '🔐 بيانات الدخول الأساسية تُضبط من متغيرات البيئة على الاستضافة. لا تُحفظ كلمات السر ولا بيانات الزبائن في content.json.'
-            : '🔐 Base credentials are set through the host environment. Passwords and customer data are never stored in content.json.'}
+            ? '🔐 كلمة السر تُتحقق على السيرفر وتُحفظ الجلسة في كوكي HttpOnly. لا تُحفظ كلمات السر ولا بيانات الزبائن في content.json.'
+            : '🔐 Passwords are verified on the server and the session lives in an HttpOnly cookie. Passwords and customer data are never stored in content.json.'}
         </p>
       </Card>
 
