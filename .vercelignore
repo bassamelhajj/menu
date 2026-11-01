@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.gitignore
+.vercel
+.vscode
+.env
+.env.*
+!.env.example
+*.log
+BENOVA-Menu-2026-Code-Map.pdf
