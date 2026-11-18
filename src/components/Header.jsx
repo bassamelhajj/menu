@@ -316,8 +316,11 @@ export default function Header() {
   const previousCount = useRef(cartCount)
 
   const ar = lang === 'ar'
+  const storedBrand = settings.name?.[ar ? 'ar' : 'en']
   const brandName =
-    settings.name?.[ar ? 'ar' : 'en'] || (ar ? 'بينوفا' : 'BENOVA')
+    ar && (!storedBrand || storedBrand.trim() === 'BENOVA')
+      ? 'بينوفا'
+      : storedBrand || 'BENOVA'
 
   /* قياس ارتفاع الهيدر لشريط الأقسام */
   useEffect(() => {

@@ -53,7 +53,11 @@ export default function AuthShell({ ar, signedIn = false, children }) {
   const { dark, toggleDark, toggleLang } = useApp()
 
   const logoSrc = settings?.logo || '/brand/benova-logo.png'
-  const brand = settings?.name?.[ar ? 'ar' : 'en'] || 'BENOVA'
+  const storedBrand = settings?.name?.[ar ? 'ar' : 'en']
+  const brand =
+    ar && (!storedBrand || storedBrand.trim() === 'BENOVA')
+      ? 'بينوفا'
+      : storedBrand || 'BENOVA'
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-bg text-ink transition-colors duration-300">

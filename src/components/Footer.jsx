@@ -74,7 +74,11 @@ export default function Footer() {
 
   const ar = lang === 'ar'
   const socials = settings.socials || {}
-  const name = settings.name?.[lang] || settings.name?.en || 'BENOVA'
+  const storedName = settings.name?.[lang] || settings.name?.en
+  const name =
+    ar && (!storedName || storedName.trim() === 'BENOVA')
+      ? 'بينوفا'
+      : storedName || 'BENOVA'
   const tagline = settings.tagline?.[lang] || settings.tagline?.en || ''
   const bio =
     settings.bio?.[lang] ||
