@@ -336,7 +336,7 @@ function Brand({ collapsed }) {
             BENOVA
           </p>
           <p className="mt-0.5 text-[7.5px] font-black uppercase tracking-[0.24em] text-white/28">
-            Executive Console
+            Admin
           </p>
         </div>
       )}
@@ -436,11 +436,7 @@ function SidebarContent({
           {!collapsed && <span className="text-[10px] font-extrabold">تسجيل الخروج</span>}
         </button>
 
-        {!collapsed && (
-          <p className="text-center text-[7px] font-black uppercase tracking-[0.22em] text-white/15">
-            Local-first · v26
-          </p>
-        )}
+
       </div>
     </>
   )
@@ -562,7 +558,7 @@ function MobileDrawer({ open, onClose, lang, tab, counts, onTab, onLogout, statu
 }
 
 export default function AdminShell({ tab, onTab, onLogout, children }) {
-  const { lang, t, notify } = useApp()
+  const { lang, notify } = useApp()
   const { settings, setSettings, orders, reviews } = useContent()
   const status = useBusinessStatus(settings.hours, lang, settings.storeStatus)
   const [collapsed, setCollapsed] = useState(readCollapsed)
@@ -739,7 +735,7 @@ export default function AdminShell({ tab, onTab, onLogout, children }) {
           </main>
 
           <footer className="border-t border-white/[0.05] px-4 py-3 text-center text-[8px] font-black uppercase tracking-[0.22em] text-white/15">
-            BENOVA · {t('adminTitle')}
+            {lang === 'ar' ? '2027 بينوفا' : '2027 BENOVA'}
           </footer>
         </div>
       </div>

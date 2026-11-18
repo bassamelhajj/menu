@@ -42,9 +42,9 @@ export default function Hero({ category = 'all' }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 }}
               className="mt-4 font-display text-4xl leading-tight tracking-wide sm:text-5xl"
-              dir="ltr"
+              dir={lang === 'ar' ? 'rtl' : 'ltr'}
             >
-              BENOVA
+              {lang === 'ar' ? 'بينوفا' : 'BENOVA'}
             </motion.h1>
 
             <motion.p

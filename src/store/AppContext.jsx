@@ -288,7 +288,7 @@ export function AppProvider({ children }) {
           }).format(createdAt)
 
       return [
-        '🧾 *فاتورة طلب جديدة من BENOVA*',
+        '🧾 *فاتورة طلب جديدة من بينوفا*',
         divider,
         `🆔 *رقم الطلب:* #${order?.id ?? '—'}`,
         `📅 *التاريخ والوقت:* ${dateTime}`,
@@ -315,7 +315,7 @@ export function AppProvider({ children }) {
         '',
         `💳 *طريقة الدفع:* ${paymentLabel}`,
         divider,
-        'شكرًا لطلبكم من **BENOVA**! 🌟',
+        'شكرًا لطلبكم من **بينوفا**! 🌟',
       ].join('\n')
     },
     [cart, cartTotalLL, cartSavingsLL, usdRate],

@@ -7,7 +7,7 @@
 // 📌 روابط السوشيال ممكن تكتبها بدون https:// — بتتحوّل تلقائياً وقت العرض
 //    (شوف normalizeUrl بالأسفل).
 export const STORE = {
-  name: { ar: 'BENOVA', en: 'BENOVA' },
+  name: { ar: 'بينوفا', en: 'BENOVA' },
   tagline: { ar: 'كريب وعصائر', en: 'Crepes & Juices' },
 
   // اللوغو والوصف القصير — بيتعدّلوا من لوحة التحكم ← الإعدادات

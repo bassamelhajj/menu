@@ -298,7 +298,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
             <p className="text-[9px] font-black uppercase tracking-[0.28em] text-gold-deep dark:text-gold">
               {isUp
                 ? ar
-                  ? 'عضوية BENOVA'
+                  ? 'عضوية بينوفا'
                   : 'BENOVA MEMBERSHIP'
                 : ar
                   ? 'دخول موحّد'
@@ -320,7 +320,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
             <p className="mt-1.5 text-[11.5px] font-semibold leading-relaxed text-muted dark:text-white/45">
               {isUp
                 ? ar
-                  ? 'اسمك، إيميلك، ورقمك — وبتصير من عائلة BENOVA.'
+                  ? 'اسمك، إيميلك، ورقمك — وبتصير من عائلة بينوفا.'
                   : 'Your name, email and phone — and you are in.'
                 : ar
                   ? 'زبون أو صاحب المحل — النظام بيعرف وين يودّيك.'
@@ -470,7 +470,7 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
                 <a
                   href={`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
                     ar
-                      ? 'مرحبتين! نسيت كلمة سر حسابي بموقع BENOVA.'
+                      ? 'مرحبتين! نسيت كلمة سر حسابي بموقع بينوفا.'
                       : 'Hi! I forgot my BENOVA account password.',
                   )}`}
                   target="_blank"
@@ -632,7 +632,7 @@ function AccountPanel({ user, ar, dark, welcome, onLogout }) {
               {user.name || firstName}
             </p>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider text-primary dark:bg-gold/10 dark:text-gold">
-              ✦ {ar ? 'عضو BENOVA' : 'BENOVA member'}
+              ✦ {ar ? 'عضو بينوفا' : 'BENOVA member'}
             </span>
           </div>
           <p

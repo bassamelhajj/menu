@@ -259,7 +259,7 @@ function HomeShell({ route }) {
         <div className="mb-5 flex items-end justify-between gap-4 sm:mb-7">
           <div className="min-w-0">
             <span className="text-[10px] font-extrabold tracking-[0.26em] text-gold-deep uppercase">
-              {view === 'home' ? t('heroKicker') : 'BENOVA'}
+              {view === 'home' ? t('heroKicker') : lang === 'ar' ? 'بينوفا' : 'BENOVA'}
             </span>
             <h2 className="mt-1 font-display text-2xl tracking-wide text-ink sm:text-3xl">
               {headerTitle}

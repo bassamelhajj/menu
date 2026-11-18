@@ -59,7 +59,7 @@ function BrandArtwork({ ar, settings, productCount, categoryCount }) {
           </motion.div>
 
           <p className="mt-6 font-display text-[30px] leading-none tracking-[0.24em] text-cream sm:text-[34px]">
-            BENOVA
+            {ar ? 'بينوفا' : 'BENOVA'}
           </p>
           <p className="mt-2 text-[9px] font-black uppercase tracking-[0.34em] text-gold/75">
             {ar ? settings.tagline?.ar : settings.tagline?.en}
@@ -156,17 +156,17 @@ export default function AboutPage() {
     <div className="min-h-screen bg-bg pb-16">
       <PageBanner
         title={title}
-        kicker={ar ? 'BENOVA · حكايتنا' : 'BENOVA · OUR STORY'}
+        kicker={ar ? 'بينوفا · حكايتنا' : 'BENOVA · OUR STORY'}
         icon={<IconSparkle size={25} />}
         subtitle={
           ar
-            ? 'حكاية كريب طازج، شوكولاتة حقيقية، وتفاصيل صغيرة صنعت نكهة BENOVA.'
+            ? 'حكاية كريب طازج، شوكولاتة حقيقية، وتفاصيل صغيرة صنعت نكهة بينوفا.'
             : 'A story of fresh crepes, real chocolate, and the small details that made BENOVA.'
         }
       >
         <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/8 px-3 py-2 text-[10px] font-black text-gold-deep dark:text-gold">
           <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-          {ar ? 'منذ 2026' : 'SINCE 2026'}
+          {ar ? '2027 بينوفا' : '2027 BENOVA'}
         </span>
       </PageBanner>
 
@@ -318,7 +318,7 @@ export default function AboutPage() {
             <div className="relative mt-5 flex items-center gap-3">
               <span className="h-px w-10 bg-gold/60" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold-deep dark:text-gold/85">
-                {ar ? 'فريق BENOVA' : 'The BENOVA team'}
+                {ar ? 'فريق بينوفا' : 'The BENOVA team'}
               </span>
             </div>
           </motion.div>

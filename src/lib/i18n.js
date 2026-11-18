@@ -1,6 +1,6 @@
 const STRINGS = {
   brandTag: { ar: 'كريب وعصائر', en: 'Crepes & Juices' },
-  heroKicker: { ar: 'منيو BENOVA', en: 'BENOVA MENU' },
+  heroKicker: { ar: 'منيو بينوفا', en: 'BENOVA MENU' },
   heroTitle: { ar: 'حلو اللحظة… بنكهة تخصّك', en: 'Sweet moments, made yours' },
   heroText: {
     ar: 'كريب طازج، شوكولاتة بلجيكية، عصائر فواكه، وافل وميلك شيك. اختار، خصّص، واطلب مباشرة.',
@@ -106,7 +106,7 @@ const STRINGS = {
   saving: { ar: 'يُحفظ تلقائياً', en: 'Auto-saved' },
   logout: { ar: 'خروج', en: 'Logout' },
   viewSite: { ar: 'عرض الموقع', en: 'View site' },
-  adminTitle: { ar: 'لوحة تحكم BENOVA', en: 'BENOVA Dashboard' },
+  adminTitle: { ar: 'لوحة تحكم بينوفا', en: 'BENOVA Dashboard' },
   totalProducts: { ar: 'منتج', en: 'products' },
   totalCategories: { ar: 'قسم', en: 'categories' },
   totalOrders: { ar: 'طلب', en: 'orders' },
@@ -129,7 +129,7 @@ const STRINGS = {
   deliveryBlock: { ar: 'بيانات التوصيل', en: 'Delivery info' },
   grandTotal: { ar: 'الإجمالي', en: 'Total' },
   greetingMsg: { ar: 'أهلاً وسهلاً! نحضّرلك الطلب بكل حب 🌿', en: 'Welcome! We make your order with love 🌿' },
-  thanksMsg: { ar: 'شكراً لاختيارك BENOVA 🌿', en: 'Thank you for choosing BENOVA 🌿' },
+  thanksMsg: { ar: 'شكراً لاختيارك بينوفا 🌿', en: 'Thank you for choosing BENOVA 🌿' },
   // ---------- صفحات الحساب والتواصل ----------
   account: { ar: 'حسابي', en: 'Account' },
   signUp: { ar: 'حساب جديد', en: 'Sign up' },

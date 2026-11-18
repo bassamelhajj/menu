@@ -62,7 +62,7 @@ export default function ProductCard({ product, index, onOpen }) {
       : isNew
         ? t('isNew')
         : lang === 'ar'
-          ? 'BENOVA'
+          ? 'بينوفا'
           : 'BENOVA'
 
   const handleMove = (e) => {

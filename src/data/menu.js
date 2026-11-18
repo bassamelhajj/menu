@@ -81,7 +81,7 @@ const REGULAR_PRODUCTS = [
   { id: 'be-peanut-butter', cat: 'belgian', ar: 'بلجيكي زبدة الفول السوداني', en: 'Belgian Peanut Butter', emoji: '🥜', descAr: 'بلجيكي بزبدة الفول السوداني', descEn: 'Belgian chocolate with peanut butter', sizes: one(600000) },
 
   // ===================== SPECIAL CREPE =====================
-  { id: 'sp-signature', cat: 'special', ar: 'كريب بنوفا المميز', en: 'BENOVA Signature', emoji: '👑', tags: ['best'], descAr: 'التشكيلة الملكية الخاصة من BENOVA', descEn: 'BENOVA royal signature creation', sizes: one(900000) },
+  { id: 'sp-signature', cat: 'special', ar: 'كريب بنوفا المميز', en: 'BENOVA Signature', emoji: '👑', tags: ['best'], descAr: 'التشكيلة الملكية الخاصة من بينوفا', descEn: 'BENOVA royal signature creation', sizes: one(900000) },
   { id: 'sp-tiramisu', cat: 'special', ar: 'كريب تيراميسو', en: 'Tiramisu Crepe', emoji: '☕', tags: ['new'], descAr: 'نكهة التيراميسو الإيطالية الشهية', descEn: 'Delicious Italian tiramisu flavour', sizes: one(750000) },
 
   // ===================== CREME PATISSIERE =====================
@@ -199,7 +199,7 @@ const REGULAR_PRODUCTS = [
   { id: 'ju-kiwi', cat: 'juice', ar: 'عصير كيوي', en: 'Kiwi Juice', emoji: '🥝', descAr: 'عصير كيوي منعش', descEn: 'Refreshing kiwi juice', sizes: mxl(300000, 400000, 600000) },
   { id: 'ju-guava', cat: 'juice', ar: 'عصير جوافة', en: 'Guava Juice', emoji: '🍐', descAr: 'عصير جوافة طبيعي', descEn: 'Natural guava juice', sizes: mxl(300000, 400000, 600000) },
   { id: 'ju-banana-milk', cat: 'juice', ar: 'عصير موز بالحليب', en: 'Banana Milk Juice', emoji: '🍌', descAr: 'موز مع حليب طازج', descEn: 'Banana with fresh milk', sizes: mxl(250000, 350000, 550000) },
-  { id: 'ju-bm', cat: 'juice', ar: 'كوكتيل B.M', en: 'B.M Cocktail', emoji: '🍹', tags: ['best'], descAr: 'الخلطة الشهيرة من BENOVA', descEn: 'BENOVA famous juice mix', sizes: mxl(300000, 400000, 600000) },
+  { id: 'ju-bm', cat: 'juice', ar: 'كوكتيل B.M', en: 'B.M Cocktail', emoji: '🍹', tags: ['best'], descAr: 'الخلطة الشهيرة من بينوفا', descEn: 'BENOVA famous juice mix', sizes: mxl(300000, 400000, 600000) },
   { id: 'ju-avoca', cat: 'juice', ar: 'عصير أفوكادو', en: 'Avocado Juice', emoji: '🥑', descAr: 'عصير أفوكادو طازج', descEn: 'Fresh avocado juice', sizes: mxl(350000, 450000, 650000) },
   { id: 'ju-pomegranate', cat: 'juice', ar: 'عصير رمان', en: 'Pomegranate Juice', emoji: '🍎', descAr: 'عصير رمان طازج', descEn: 'Fresh pomegranate juice', sizes: mxl(300000, 400000, 600000) },
   { id: 'ju-mixed', cat: 'juice', ar: 'فواكه مشكّلة', en: 'Mixed Fruits Juice', emoji: '🍹', descAr: 'كوكتيل فواكه مشكّلة', descEn: 'Mixed fruit cocktail', sizes: mxl(350000, 450000, 650000) },

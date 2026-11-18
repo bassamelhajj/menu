@@ -407,7 +407,7 @@ export default function Footer() {
             className="h-px w-10 bg-gradient-to-r from-transparent to-gold/45 sm:w-16"
           />
           <p className="whitespace-nowrap font-display text-[15px] tracking-[0.22em] text-cream/75 sm:text-base">
-            BENOVA
+            {ar ? '2027 بينوفا' : '2027 BENOVA'}
           </p>
           <span
             aria-hidden

@@ -149,7 +149,7 @@ export default function AuthShell({ ar, signedIn = false, children }) {
                 <p className="relative mx-auto mt-1.5 max-w-[300px] text-[11px] font-semibold leading-relaxed text-muted dark:text-white/40">
                   {signedIn
                     ? ar
-                      ? 'مساحتك الشخصية داخل BENOVA — مفضلاتك، آراؤك، وعروضك.'
+                      ? 'مساحتك الشخصية داخل بينوفا — مفضلاتك، آراؤك، وعروضك.'
                       : 'Your personal BENOVA space — favorites, reviews and offers.'
                     : ar
                       ? 'دخول موحّد وآمن للزبائن وإدارة المطعم — من دون أبواب منفصلة.'

@@ -316,6 +316,8 @@ export default function Header() {
   const previousCount = useRef(cartCount)
 
   const ar = lang === 'ar'
+  const brandName =
+    settings.name?.[ar ? 'ar' : 'en'] || (ar ? 'بينوفا' : 'BENOVA')
 
   /* قياس ارتفاع الهيدر لشريط الأقسام */
   useEffect(() => {
@@ -398,7 +400,7 @@ export default function Header() {
             type="button"
             whileTap={{ scale: 0.97 }}
             onClick={goTop}
-            aria-label={ar ? 'BENOVA — العودة للأعلى' : 'BENOVA — back to top'}
+            aria-label={ar ? `${brandName} — العودة للأعلى` : `${brandName} — back to top`}
             className="group flex min-w-0 shrink-0 items-center gap-2.5 text-start"
           >
             <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#f4ead3] p-1 shadow-[0_8px_20px_-14px_rgba(44,29,18,0.9)] ring-1 ring-gold/35 transition-transform duration-300 group-hover:-translate-y-0.5 sm:h-12 sm:w-12">
@@ -410,7 +412,7 @@ export default function Header() {
             </span>
             <span className="hidden min-w-0 sm:block">
               <span className="block font-display text-[17px] leading-none tracking-[0.16em] text-ink">
-                BENOVA
+                {brandName}
               </span>
               <span className="mt-1 flex items-center gap-1.5">
                 <span className="truncate text-[9.5px] font-black tracking-[0.08em] text-muted">

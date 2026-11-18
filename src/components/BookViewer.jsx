@@ -76,7 +76,7 @@ export default function BookViewer({ startIndex = 0, onClose }) {
 
         <div className="text-center">
           <p className="text-[11px] font-extrabold tracking-[0.28em] text-gold">
-            BENOVA
+            {lang === 'ar' ? 'بينوفا' : 'BENOVA'}
           </p>
           <p className="mt-0.5 text-[10px] font-bold text-cream/70">{label}</p>
         </div>

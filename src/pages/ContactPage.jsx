@@ -222,7 +222,7 @@ export default function ContactPage() {
     if (!validate()) return
 
     const topic = TOPICS.find((item) => item.id === form.topic) || TOPICS[0]
-    const intro = ar ? 'رسالة جديدة من موقع BENOVA' : 'New message from the BENOVA website'
+    const intro = ar ? 'رسالة جديدة من موقع بينوفا' : 'New message from the BENOVA website'
     const body = [
       intro,
       `${ar ? 'الموضوع' : 'Topic'}: ${ar ? topic.ar : topic.en}`,
@@ -281,7 +281,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-bg pb-16">
       <PageBanner
         title={ar ? 'اتصل بنا' : 'Contact us'}
-        kicker={ar ? 'BENOVA · تواصل' : 'BENOVA · CONTACT'}
+        kicker={ar ? 'بينوفا · تواصل' : 'BENOVA · CONTACT'}
         icon={<IconPhone size={24} />}
         subtitle={
           ar

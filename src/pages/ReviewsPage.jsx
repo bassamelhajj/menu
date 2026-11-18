@@ -55,7 +55,7 @@ export default function ReviewsPage() {
         .filter((review) => review.status === 'approved')
         .map((review) => ({
           key: `customer-${review.id}`,
-          name: review.name || (ar ? 'زبون BENOVA' : 'BENOVA guest'),
+          name: review.name || (ar ? 'زبون بينوفا' : 'BENOVA guest'),
           rating: Number(review.rating) || 5,
           text: review.text || '',
           image: review.image || '',
@@ -71,7 +71,7 @@ export default function ReviewsPage() {
         .filter((item) => item.active !== false)
         .map((item) => ({
           key: `featured-${item.id}`,
-          name: item.name || (ar ? 'ضيف BENOVA' : 'BENOVA guest'),
+          name: item.name || (ar ? 'ضيف بينوفا' : 'BENOVA guest'),
           rating: Number(item.rating) || 5,
           text: item.text?.[lang] || item.text?.en || item.text?.ar || '',
           image: '',
@@ -113,11 +113,11 @@ export default function ReviewsPage() {
     <div className="min-h-screen bg-bg pb-16">
       <PageBanner
         title={title}
-        kicker={ar ? 'BENOVA · المجتمع' : 'BENOVA · COMMUNITY'}
+        kicker={ar ? 'بينوفا · المجتمع' : 'BENOVA · COMMUNITY'}
         icon={<IconStar size={26} />}
         subtitle={
           ar
-            ? 'كلمات حقيقية من زبائن BENOVA — تجارب، تفاصيل، ونجوم بتعبّر عن كل لقمة.'
+            ? 'كلمات حقيقية من زبائن بينوفا — تجارب، تفاصيل، ونجوم بتعبّر عن كل لقمة.'
             : 'Real words from BENOVA guests — experiences, details, and stars for every bite.'
         }
       >
@@ -269,7 +269,7 @@ export default function ReviewsPage() {
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
               <span className="text-[9px] font-black uppercase tracking-[0.26em] text-gold-deep dark:text-gold/80">
-                {ar ? 'من مجتمع BENOVA' : 'FROM THE COMMUNITY'}
+                {ar ? 'من مجتمع بينوفا' : 'FROM THE COMMUNITY'}
               </span>
               <h2 className="mt-1 font-display text-xl tracking-wide text-ink dark:text-cream sm:text-2xl">
                 {ar ? 'كلمات بتستاهل تنقرأ' : 'Words worth reading'}

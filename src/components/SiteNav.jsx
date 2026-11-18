@@ -300,7 +300,7 @@ export default function SiteNav() {
                       </span>
                       <div className="min-w-0">
                         <p className="font-display text-[17px] leading-none tracking-[0.13em] text-ink">
-                          BENOVA
+                          {ar ? 'بينوفا' : 'BENOVA'}
                         </p>
                         <p className="mt-1 truncate text-[10px] font-bold tracking-wide text-muted">
                           {ar ? settings.tagline?.ar : settings.tagline?.en}

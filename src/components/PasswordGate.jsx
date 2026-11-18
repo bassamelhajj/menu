@@ -140,7 +140,7 @@ export default function PasswordGate({ children }) {
         </div>
 
         <p className="pt-2 text-[10px] font-bold text-cream/30">
-          BENOVA · {ar ? 'كريب وعصائر' : 'Crepes & Juices'}
+          {ar ? 'بينوفا' : 'BENOVA'} · {ar ? 'كريب وعصائر' : 'Crepes & Juices'}
         </p>
       </motion.div>
     </motion.div>

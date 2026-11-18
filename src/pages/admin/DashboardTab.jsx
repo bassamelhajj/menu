@@ -153,7 +153,7 @@ export default function DashboardTab({ goTab }) {
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-gold/25 bg-gold/[0.08] px-2.5 py-1 text-[7.5px] font-black uppercase tracking-[0.22em] text-gold">
-                BENOVA · Executive
+                BENOVA
               </span>
               <span className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.035] px-2.5 py-1 text-[8px] font-black text-white/40">
                 <span
@@ -176,8 +176,8 @@ export default function DashboardTab({ goTab }) {
             </h2>
             <p className="mt-2 max-w-xl text-[11px] font-semibold leading-relaxed text-white/38 sm:text-xs">
               {ar
-                ? 'مركز قيادة واحد لكل تفاصيل BENOVA: المنيو، الطلبات، الزبائن، الهوية، والنشر — بتجربة محلية سريعة وآمنة.'
-                : 'One command center for every BENOVA detail: menu, orders, customers, identity and publishing — fast, local and private.'}
+                ? 'كل تفاصيل بينوفا في مكان واحد: المنيو، الطلبات، الزبائن، الهوية، والنشر.'
+                : 'Everything for BENOVA in one place: menu, orders, customers, identity and publishing.'}
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">

@@ -61,7 +61,7 @@ export default function FAQPage() {
     <div className="min-h-screen bg-bg pb-16">
       <PageBanner
         title={title}
-        kicker={ar ? 'BENOVA · مساعدة' : 'BENOVA · HELP'}
+        kicker={ar ? 'بينوفا · مساعدة' : 'BENOVA · HELP'}
         icon={<span className="font-display text-2xl leading-none">؟</span>}
         subtitle={
           ar
@@ -91,7 +91,7 @@ export default function FAQPage() {
                 </h2>
                 <p className="mt-2 text-[11.5px] font-semibold leading-6 text-cream/70">
                   {ar
-                    ? 'إذا سؤالك مو موجود أو بدك تعدّل طلبك، راسلنا واتساب وردّ عليك فريق BENOVA.'
+                    ? 'إذا سؤالك مو موجود أو بدك تعدّل طلبك، راسلنا واتساب وردّ عليك فريق بينوفا.'
                     : 'If your question is not here or you need to adjust an order, message us on WhatsApp.'}
                 </p>
 

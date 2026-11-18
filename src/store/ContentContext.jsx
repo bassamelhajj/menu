@@ -46,7 +46,7 @@ const DEFAULT_PAGES = {
     active: true,
     title: { ar: 'من نحن', en: 'About us' },
     body: {
-      ar: 'قصة BENOVA\n\nبدأنا بشغف بسيط: كريب طازج وعصير طبيعي بطعم بيت. اليوم عندنا منيو كامل من الكريبات البلجيكية والأكواب الباردة وافل وميلك شيك.\n\nكل طلب بيتحضر قدامك — بلا مجمدات، بلا مواد حافظة، بلا استعجال.',
+      ar: 'قصة بينوفا\n\nبدأنا بشغف بسيط: كريب طازج وعصير طبيعي بطعم بيت. اليوم عندنا منيو كامل من الكريبات البلجيكية والأكواب الباردة وافل وميلك شيك.\n\nكل طلب بيتحضر قدامك — بلا مجمدات، بلا مواد حافظة، بلا استعجال.',
       en: 'Our story\n\nWe started with a simple passion: fresh crepes, natural juices, a home taste. Today we have a full menu: Belgian crepes, cold cups, waffles and shakes.\n\nEvery order is prepared in front of you — no frozen ingredients, no preservatives, no rushing.',
     },
   },
