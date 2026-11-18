@@ -8,6 +8,7 @@
 
 import { loadEnv } from 'vite'
 import {
+  adminCredentialsHandler,
   adminLoginHandler,
   adminLogoutHandler,
   adminSessionHandler,
@@ -17,6 +18,8 @@ const SERVER_KEYS = [
   'ADMIN_USERNAME',
   'ADMIN_PASSWORD_HASH',
   'ADMIN_SESSION_SECRET',
+  'DATABASE_URL',
+  'DATABASE_SSL',
 ]
 
 export function devAdminApi() {
@@ -29,6 +32,9 @@ export function devAdminApi() {
         if (path === '/api/admin/login') return await adminLoginHandler(req, res)
         if (path === '/api/admin/session') return await adminSessionHandler(req, res)
         if (path === '/api/admin/logout') return await adminLogoutHandler(req, res)
+        if (path === '/api/admin/credentials') {
+          return await adminCredentialsHandler(req, res)
+        }
         res.statusCode = 404
         res.setHeader('Content-Type', 'application/json; charset=utf-8')
         res.end(JSON.stringify({ error: 'not_found' }))

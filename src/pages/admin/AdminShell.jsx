@@ -18,6 +18,7 @@ import {
   IconLogout,
   IconMenu,
   IconReceipt,
+  IconShield,
   IconSparkle,
   IconStar,
   IconTruck,
@@ -63,6 +64,7 @@ const NAV_GROUPS = [
     en: 'System & Security',
     items: [
       { id: 'settings', ar: 'الإعدادات', en: 'Settings', Icon: IconCog },
+      { id: 'credentials', ar: 'بيانات الدخول', en: 'Credentials', Icon: IconShield },
       { id: 'delivery', ar: 'التوصيل والرسوم', en: 'Delivery & Fees', Icon: IconTruck },
       { id: 'publish', ar: 'النسخ والنشر', en: 'Backup & Publish', Icon: IconDatabase },
     ],

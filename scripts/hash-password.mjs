@@ -1,4 +1,4 @@
-import { hashAdminPassword } from '../server/adminAuth.js'
+import { hashAdminPassword } from '../server/password.js'
 
 const password = process.argv.slice(2).join(' ')
 

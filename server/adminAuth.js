@@ -1,26 +1,20 @@
-/**
- * server/adminAuth.js — مصادقة الأدمن على السيرفر
- * ===========================================================================
- * لماذا؟
- *   أي كلمة سر تُرسل إلى المتصفح عبر `VITE_*` تصبح مكشوفة. لذلك، في الإنتاج،
- *   يتم التحقق من كلمة السر داخل Vercel Function فقط، وتُعاد جلسة موقّعة
- *   داخل كوكي HttpOnly. المتصفح لا يرى كلمة السر ولا البصمة ولا مفتاح الجلسة.
- *
- * المتغيرات المطلوبة على السيرفر (Vercel):
- *   ADMIN_USERNAME        اسم مستخدم الأدمن
- *   ADMIN_PASSWORD_HASH   بصمة scrypt من scripts/hash-password.mjs
- *   ADMIN_SESSION_SECRET  مفتاح عشوائي طويل لتوقيع الجلسة
- */
+import { createHmac, timingSafeEqual } from 'node:crypto'
+import { hashAdminPassword, MAX_PASSWORD_LENGTH, verifyAdminPassword } from './password.js'
+import { isDatabaseConfigured } from './db.js'
+import {
+  ensureInitialAdmin,
+  findAdminById,
+  findAdminByUsername,
+  logAdminEvent,
+  updateAdminCredentials,
+} from './adminStore.js'
 
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
+export { hashAdminPassword, verifyAdminPassword }
 
 const COOKIE_NAME = 'benova_admin'
 const SESSION_TTL_SECONDS = 8 * 60 * 60
-const SCRYPT_N = 16384
-const SCRYPT_R = 8
-const SCRYPT_P = 1
-const SCRYPT_KEYLEN = 64
-const MAX_PASSWORD_LENGTH = 200
+const MIN_PASSWORD_LENGTH = 12
+const USERNAME_PATTERN = /^[A-Za-z0-9._@+-]{3,64}$/
 
 const MAX_ATTEMPTS = 5
 const WINDOW_MS = 10 * 60 * 1000
@@ -35,74 +29,41 @@ const safeEqual = (a, b) => {
   return timingSafeEqual(left, right)
 }
 
-/** ينشئ بصمة scrypt بالصيغة: scrypt$N$r$p$salt$hash */
-export function hashAdminPassword(password) {
-  const value = String(password ?? '')
-  if (!value) throw new Error('Password is required')
-  const salt = randomBytes(16)
-  const hash = scryptSync(value, salt, SCRYPT_KEYLEN, {
-    N: SCRYPT_N,
-    r: SCRYPT_R,
-    p: SCRYPT_P,
-    maxmem: 128 * 1024 * 1024,
-  })
-  return `scrypt$${SCRYPT_N}$${SCRYPT_R}$${SCRYPT_P}$${salt.toString('hex')}$${hash.toString('hex')}`
-}
-
-/** يتحقق من كلمة السر مقابل بصمة scrypt. */
-export function verifyAdminPassword(password, stored) {
-  const value = String(password ?? '')
-  if (!value || value.length > MAX_PASSWORD_LENGTH) return false
-
-  const parts = String(stored ?? '').split('$')
-  if (parts.length !== 6 || parts[0] !== 'scrypt') return false
-
-  const [, n, r, p, saltHex, hashHex] = parts
-  const N = Number(n)
-  const rValue = Number(r)
-  const pValue = Number(p)
-  if (!Number.isInteger(N) || !Number.isInteger(rValue) || !Number.isInteger(pValue)) {
-    return false
-  }
-  if (!/^[a-f0-9]{32}$/i.test(saltHex) || !/^[a-f0-9]{128}$/i.test(hashHex)) return false
-
-  try {
-    const expected = Buffer.from(hashHex, 'hex')
-    const actual = scryptSync(value, Buffer.from(saltHex, 'hex'), expected.length, {
-      N,
-      r: rValue,
-      p: pValue,
-      maxmem: 128 * 1024 * 1024,
-    })
-    return actual.length === expected.length && timingSafeEqual(actual, expected)
-  } catch {
-    return false
-  }
-}
-
 const sessionSecret = () => text(process.env.ADMIN_SESSION_SECRET)
 
+const hasBootstrapCredentials = () =>
+  Boolean(text(process.env.ADMIN_USERNAME) && text(process.env.ADMIN_PASSWORD_HASH))
+
 const configured = () =>
-  Boolean(
-    text(process.env.ADMIN_USERNAME) &&
-      text(process.env.ADMIN_PASSWORD_HASH) &&
-      sessionSecret().length >= 32,
-  )
+  sessionSecret().length >= 32 &&
+  (isDatabaseConfigured() || hasBootstrapCredentials())
+
+const legacyAdmin = () => {
+  const username = text(process.env.ADMIN_USERNAME)
+  const passwordHash = text(process.env.ADMIN_PASSWORD_HASH)
+  if (!username || !passwordHash) return null
+  return { id: null, username, password_hash: passwordHash, session_version: 0 }
+}
 
 const sign = (payload) =>
   createHmac('sha256', sessionSecret()).update(payload).digest('base64url')
 
-function createSessionToken(username) {
-  const payload = Buffer.from(
-    JSON.stringify({
-      u: username,
-      exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
-    }),
-  ).toString('base64url')
-  return `${payload}.${sign(payload)}`
+function createSessionToken(admin) {
+  const payload = {
+    u: admin.username,
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+  }
+
+  if (isDatabaseConfigured()) {
+    payload.sub = String(admin.id)
+    payload.ver = Number(admin.session_version)
+  }
+
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url')
+  return `${encoded}.${sign(encoded)}`
 }
 
-function readSessionToken(token) {
+async function readSessionToken(token) {
   const value = text(token)
   const dot = value.lastIndexOf('.')
   if (dot <= 0) return null
@@ -111,15 +72,27 @@ function readSessionToken(token) {
   const signature = value.slice(dot + 1)
   if (!safeEqual(signature, sign(payload))) return null
 
+  let data
   try {
-    const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
-    if (!data || typeof data.u !== 'string') return null
-    if (Number(data.exp) <= Math.floor(Date.now() / 1000)) return null
-    if (!safeEqual(data.u, text(process.env.ADMIN_USERNAME))) return null
-    return data
+    data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
   } catch {
     return null
   }
+
+  if (!data || typeof data.u !== 'string') return null
+  if (Number(data.exp) <= Math.floor(Date.now() / 1000)) return null
+
+  if (!isDatabaseConfigured()) {
+    const expected = text(process.env.ADMIN_USERNAME)
+    return safeEqual(data.u.toLowerCase(), expected.toLowerCase()) ? legacyAdmin() : null
+  }
+
+  if (!data.sub) return null
+  const admin = await findAdminById(String(data.sub))
+  if (!admin) return null
+  if (!safeEqual(data.u, admin.username)) return null
+  if (Number(data.ver) !== Number(admin.session_version)) return null
+  return admin
 }
 
 function parseCookies(req) {
@@ -142,6 +115,7 @@ function cookieHeader(req, token, maxAge) {
     !isLocal &&
     (process.env.NODE_ENV === 'production' ||
       String(req.headers?.['x-forwarded-proto'] || '').split(',')[0].trim() === 'https')
+
   const parts = [
     `${COOKIE_NAME}=${encodeURIComponent(token || '')}`,
     'Path=/',
@@ -149,6 +123,7 @@ function cookieHeader(req, token, maxAge) {
     'SameSite=Strict',
     `Max-Age=${maxAge}`,
   ]
+
   if (secure) parts.push('Secure')
   return parts.join('; ')
 }
@@ -212,6 +187,14 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body))
 }
 
+function sendDatabaseError(res, error) {
+  if (error?.code === '42P01') {
+    sendJson(res, 503, { error: 'database_not_initialized' })
+    return
+  }
+  sendJson(res, 503, { error: 'database_unavailable' })
+}
+
 export async function adminLoginHandler(req, res) {
   if (req.method !== 'POST') {
     sendJson(res, 405, { error: 'method_not_allowed' })
@@ -223,17 +206,15 @@ export async function adminLoginHandler(req, res) {
     return
   }
 
-  const key = `${clientIp(req)}:${text(process.env.ADMIN_USERNAME).toLowerCase()}`
+  const body = await readJson(req)
+  const username = text(body?.username)
+  const password = String(body?.password ?? '')
+  const key = `${clientIp(req)}:${username.toLowerCase() || 'login'}`
+
   if (isRateLimited(key)) {
     sendJson(res, 429, { error: 'too_many_attempts' })
     return
   }
-
-  const body = await readJson(req)
-  const username = text(body?.username)
-  const password = String(body?.password ?? '')
-  const expectedUser = text(process.env.ADMIN_USERNAME)
-  const expectedHash = text(process.env.ADMIN_PASSWORD_HASH)
 
   if (!username || !password) {
     recordFailure(key)
@@ -241,19 +222,40 @@ export async function adminLoginHandler(req, res) {
     return
   }
 
-  const userOk = safeEqual(username, expectedUser)
-  const passwordOk = verifyAdminPassword(password, expectedHash)
+  try {
+    if (isDatabaseConfigured()) {
+      const ready = await ensureInitialAdmin()
+      if (!ready) {
+        sendJson(res, 503, { error: 'admin_not_initialized' })
+        return
+      }
+    }
 
-  if (!userOk || !passwordOk) {
-    recordFailure(key)
-    sendJson(res, 401, { error: 'invalid_credentials' })
-    return
+    const admin = isDatabaseConfigured()
+      ? await findAdminByUsername(username)
+      : legacyAdmin()
+
+    if (!admin) {
+      recordFailure(key)
+      sendJson(res, 401, { error: 'invalid_credentials' })
+      return
+    }
+
+    const userOk = safeEqual(username.toLowerCase(), admin.username.toLowerCase())
+    const passwordOk = verifyAdminPassword(password, admin.password_hash)
+
+    if (!userOk || !passwordOk) {
+      recordFailure(key)
+      sendJson(res, 401, { error: 'invalid_credentials' })
+      return
+    }
+
+    clearFailures(key)
+    res.setHeader('Set-Cookie', cookieHeader(req, createSessionToken(admin), SESSION_TTL_SECONDS))
+    sendJson(res, 200, { authenticated: true, username: admin.username })
+  } catch (error) {
+    sendDatabaseError(res, error)
   }
-
-  clearFailures(key)
-  const token = createSessionToken(expectedUser)
-  res.setHeader('Set-Cookie', cookieHeader(req, token, SESSION_TTL_SECONDS))
-  sendJson(res, 200, { authenticated: true, username: expectedUser })
 }
 
 export async function adminSessionHandler(req, res) {
@@ -267,12 +269,128 @@ export async function adminSessionHandler(req, res) {
     return
   }
 
-  const token = parseCookies(req)[COOKIE_NAME]
-  const session = readSessionToken(token)
-  sendJson(res, 200, {
-    authenticated: Boolean(session),
-    username: session ? text(process.env.ADMIN_USERNAME) : null,
-  })
+  try {
+    const token = parseCookies(req)[COOKIE_NAME]
+    const admin = await readSessionToken(token)
+    sendJson(res, 200, {
+      authenticated: Boolean(admin),
+      username: admin ? admin.username : null,
+    })
+  } catch (error) {
+    sendDatabaseError(res, error)
+  }
+}
+
+export async function adminCredentialsHandler(req, res) {
+  if (req.method !== 'POST') {
+    sendJson(res, 405, { error: 'method_not_allowed' })
+    return
+  }
+
+  if (!isDatabaseConfigured()) {
+    sendJson(res, 503, { error: 'database_not_configured' })
+    return
+  }
+
+  if (!configured()) {
+    sendJson(res, 503, { error: 'not_configured' })
+    return
+  }
+
+  const key = `credentials:${clientIp(req)}`
+  if (isRateLimited(key)) {
+    sendJson(res, 429, { error: 'too_many_attempts' })
+    return
+  }
+
+  try {
+    const admin = await readSessionToken(parseCookies(req)[COOKIE_NAME])
+    if (!admin) {
+      sendJson(res, 401, { error: 'unauthorized' })
+      return
+    }
+
+    const body = await readJson(req)
+    const currentPassword = String(body?.currentPassword ?? '')
+    const username = text(body?.username)
+    const newPassword = String(body?.newPassword ?? '')
+    const confirmPassword = String(body?.confirmPassword ?? '')
+
+    if (!currentPassword) {
+      sendJson(res, 400, { error: 'current_password_required' })
+      return
+    }
+
+    if (!USERNAME_PATTERN.test(username)) {
+      sendJson(res, 400, { error: 'invalid_username' })
+      return
+    }
+
+    if (newPassword && newPassword.length < MIN_PASSWORD_LENGTH) {
+      sendJson(res, 400, { error: 'password_too_short' })
+      return
+    }
+
+    if (newPassword.length > MAX_PASSWORD_LENGTH) {
+      sendJson(res, 400, { error: 'password_too_long' })
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      sendJson(res, 400, { error: 'password_mismatch' })
+      return
+    }
+
+    if (!verifyAdminPassword(currentPassword, admin.password_hash)) {
+      recordFailure(key)
+      sendJson(res, 401, { error: 'invalid_current_password' })
+      return
+    }
+
+    if (newPassword && verifyAdminPassword(newPassword, admin.password_hash)) {
+      sendJson(res, 400, { error: 'password_reused' })
+      return
+    }
+
+    const usernameChanged = username.toLowerCase() !== admin.username.toLowerCase()
+    if (!newPassword && !usernameChanged) {
+      sendJson(res, 400, { error: 'no_changes' })
+      return
+    }
+
+    const passwordHash = newPassword ? hashAdminPassword(newPassword) : admin.password_hash
+    const updated = await updateAdminCredentials({
+      id: admin.id,
+      username,
+      passwordHash,
+    })
+
+    if (!updated) {
+      sendJson(res, 404, { error: 'admin_not_found' })
+      return
+    }
+
+    clearFailures(key)
+    res.setHeader('Set-Cookie', cookieHeader(req, createSessionToken(updated), SESSION_TTL_SECONDS))
+    await logAdminEvent({
+      adminId: updated.id,
+      action:
+        newPassword && usernameChanged
+          ? 'credentials_changed'
+          : newPassword
+            ? 'password_changed'
+            : 'username_changed',
+      ip: clientIp(req),
+      userAgent: req.headers?.['user-agent'],
+    })
+    sendJson(res, 200, { authenticated: true, username: updated.username })
+  } catch (error) {
+    if (error?.code === '23505') {
+      sendJson(res, 409, { error: 'username_taken' })
+      return
+    }
+    sendDatabaseError(res, error)
+  }
 }
 
 export async function adminLogoutHandler(req, res) {

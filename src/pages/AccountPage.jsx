@@ -233,6 +233,16 @@ export default function AccountPage({ adminEntry = false, onAdminAuthed }) {
       return
     }
 
+    if (adminEntry && adminResult.status === 503) {
+      registerFailure(
+        ar
+          ? 'دخول الأدمن غير مهيأ بعد. تحقق من DATABASE_URL ثم شغّل npm run db:init.'
+          : 'Admin sign-in is not configured yet. Check DATABASE_URL, then run npm run db:init.',
+      )
+      setPassword('')
+      return
+    }
+
     // 👤 زبون عادي → جلسة زبون ثم المنيو الرئيسي
     const found = signInCustomer(entered, password)
     if (!found) {

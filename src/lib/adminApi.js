@@ -34,3 +34,11 @@ export function getAdminSession() {
 export function logoutAdmin() {
   return request('/api/admin/logout', { method: 'POST' })
 }
+
+export function changeAdminCredentials(payload) {
+  return request('/api/admin/credentials', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+}

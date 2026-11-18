@@ -16,7 +16,7 @@ const normalizeLogoSrc = (value) => {
   return normalizeUrl(raw)
 }
 
-export default function SettingsTab({ notify }) {
+export default function SettingsTab({ notify, goTab }) {
   const { t, lang } = useApp()
   const { settings, setSettings } = useContent()
 
@@ -304,41 +304,32 @@ export default function SettingsTab({ notify }) {
         <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.025] p-3.5">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-[10px] font-black text-white/65">
-              {lang === 'ar' ? 'تغيير كلمة سر الأدمن' : 'Change admin password'}
+              {lang === 'ar' ? 'بيانات دخول الأدمن' : 'Admin credentials'}
             </p>
             <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-gold">
-              {lang === 'ar' ? 'من السيرفر' : 'Server-side'}
+              {lang === 'ar' ? 'قاعدة البيانات' : 'Database-backed'}
             </span>
           </div>
 
           <p className="text-[9.5px] font-bold leading-relaxed text-white/45">
             {lang === 'ar'
-              ? 'لأسباب أمنية لا تُحفظ كلمة السر في المتصفح. أنشئ بصمة scrypt جديدة ثم حدّث متغير السيرفر:'
-              : 'For security, passwords are never stored in the browser. Generate a new scrypt hash, then update the server variable:'}
+              ? 'غيّر اسم المستخدم أو كلمة السر من صفحة بيانات الدخول. تُحفظ كلمة السر كبصمة scrypt على السيرفر.'
+              : 'Change the username or password from the Credentials page. The password is stored as a scrypt hash on the server.'}
           </p>
 
-          <code className="mt-2.5 block break-all rounded-xl border border-gold/20 bg-black/20 px-3 py-2 font-mono text-[9px] leading-relaxed text-gold/90">
-            npm run hash -- &quot;كلمة-سر-قوية&quot;
-          </code>
-
-          <div className="mt-2.5 space-y-1 rounded-xl border border-amber-400/15 bg-amber-400/[0.05] px-3 py-2 text-[9px] font-bold leading-relaxed text-amber-200/65">
-            <p>
-              {lang === 'ar'
-                ? 'على Vercel: Settings → Environment Variables → حدّث ADMIN_PASSWORD_HASH ثم أعد النشر.'
-                : 'On Vercel: Settings → Environment Variables → update ADMIN_PASSWORD_HASH, then redeploy.'}
-            </p>
-            <p>
-              {lang === 'ar'
-                ? 'محلياً: ضع البصمة في .env.local ثم أعد تشغيل npm run dev.'
-                : 'Locally: put the hash in .env.local, then restart npm run dev.'}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => goTab?.('credentials')}
+            className="btn-primary mt-3 w-full py-2.5"
+          >
+            {lang === 'ar' ? 'فتح بيانات الدخول' : 'Open credentials'}
+          </button>
         </div>
 
         <p className="mt-2.5 rounded-xl border border-gold/12 bg-gold/[0.045] px-3 py-2 text-[9px] font-bold leading-relaxed text-white/32">
           {lang === 'ar'
-            ? '🔐 كلمة السر تُتحقق على السيرفر وتُحفظ الجلسة في كوكي HttpOnly. لا تُحفظ كلمات السر ولا بيانات الزبائن في content.json.'
-            : '🔐 Passwords are verified on the server and the session lives in an HttpOnly cookie. Passwords and customer data are never stored in content.json.'}
+            ? '🔐 كلمة السر تُتحقق على السيرفر وتُحفظ الجلسة في كوكي HttpOnly. تغيير بيانات الدخول يُلغي الجلسات القديمة.'
+            : '🔐 Passwords are verified on the server and the session lives in an HttpOnly cookie. Changing credentials invalidates old sessions.'}
         </p>
       </Card>
 

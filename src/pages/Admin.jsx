@@ -12,6 +12,7 @@ import ExtrasTab from './admin/ExtrasTab'
 import OrdersTab from './admin/OrdersTab'
 import CustomersTab from './admin/CustomersTab'
 import ReviewsTab from './admin/ReviewsTab'
+import CredentialsTab from './admin/CredentialsTab'
 import SettingsTab from './admin/SettingsTab'
 import DeliveryTab from './admin/DeliveryTab'
 import PagesTab from './admin/PagesTab'
@@ -65,7 +66,8 @@ export default function Admin() {
     customers: <CustomersTab />,
     reviews: <ReviewsTab />,
     pages: <PagesTab goTab={setTab} />,
-    settings: <SettingsTab notify={notify} />,
+    settings: <SettingsTab notify={notify} goTab={setTab} />,
+    credentials: <CredentialsTab notify={notify} />,
     delivery: <DeliveryTab notify={notify} />,
     publish: <PublishTab notify={notify} />,
   }

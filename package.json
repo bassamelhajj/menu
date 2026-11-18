@@ -9,13 +9,16 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "hash": "node scripts/hash-password.mjs",
-    "secret": "node scripts/generate-secret.mjs"
+    "secret": "node scripts/generate-secret.mjs",
+    "db:init": "node scripts/init-db.mjs",
+    "db:reset-admin": "node scripts/reset-admin.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
     "framer-motion": "^14.1.0",
     "pdf-lib": "^1.17.1",
+    "pg": "^8.23.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "three": "^0.186.1"
